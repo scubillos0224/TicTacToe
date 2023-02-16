@@ -1,0 +1,280 @@
+import java.util.*;
+import java.swing.*;
+
+public class TTTGameWorking {
+
+    static ArrayList<Integer> playerPos = new ArrayList<Integer>();
+    static ArrayList<Integer> cpuPos = new ArrayList<Integer>();
+
+    public static void main(String[] args) {
+        // Call username and play methods to run code
+
+        userName();
+        play();
+        
+        // Begin loop to ask user if they would like to play again
+        
+        // int play = 1;
+
+        // While(play){
+        //     play();
+        //     System.out.println("Play again?")
+        
+        //     play = scnr.nextInt();
+        
+        // }
+        
+        
+        
+        System.out.println("Would you like to play again? Type 0 for 'Yes' or 1 for 'No'.");
+        Scanner scnr = new Scanner(System.in);
+        int keepPlaying = scnr.nextInt();
+
+        if (keepPlaying == 0) {
+            play();
+        } else if (keepPlaying == 1) {
+            System.out.println("Goodbye! Thanks for playing have a beautiful time!");
+        } else {
+            System.err.println("Invalid Answer, Goodbye.");
+        }
+
+    }
+
+    // This intance method is for printing out the game board
+    public static void printTTTBoard(char[][] board) {
+        for (char[] row : board) {
+            for (char a : row) {
+                System.out.print(a);
+            }
+            System.out.println();
+        }
+    }
+
+    // Instance method for placing player or cpu token on the board array using
+    // different array positions to store the value
+    public static void placeToken(char[][] board, int token, String user) {
+
+        char symbol = ' ';
+
+        if (user.equals("Player")) {
+            symbol = 'X';
+            playerPos.add(token);
+        }
+
+        else if (user.equals("CPU")) {
+            symbol = 'O';
+            cpuPos.add(token);
+        }
+
+        switch (token) {
+            case 1:
+                board[0][0] = symbol;
+                break;
+            case 2:
+                board[0][2] = symbol;
+                break;
+            case 3:
+                board[0][4] = symbol;
+                break;
+            case 4:
+                board[2][0] = symbol;
+                break;
+            case 5:
+                board[2][2] = symbol;
+                break;
+            case 6:
+                board[2][4] = symbol;
+                break;
+            case 7:
+                board[4][0] = symbol;
+                break;
+            case 8:
+                board[4][2] = symbol;
+                break;
+            case 9:
+                board[4][4] = symbol;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // Instance method that determines all the string array positions that leads to
+    // a win
+    public static String winners() {
+        List top = Arrays.asList(1, 2, 3);
+        List middle = Arrays.asList(4, 5, 6);
+        List bottom = Arrays.asList(7, 8, 9);
+        List leftCol = Arrays.asList(1, 4, 7);
+        List middleCol = Arrays.asList(2, 5, 8);
+        List rightCol = Arrays.asList(3, 6, 9);
+        List cross = Arrays.asList(1, 5, 9);
+        List cross2 = Arrays.asList(7, 5, 3);
+
+        List<List> winCondition = new ArrayList<List>();
+        winCondition.add(top);
+        winCondition.add(middle);
+        winCondition.add(bottom);
+        winCondition.add(leftCol);
+        winCondition.add(middleCol);
+        winCondition.add(rightCol);
+        winCondition.add(cross);
+        winCondition.add(cross2);
+        // Display the condition inside the for loop, leave tie outside the loop so it
+        // wont bug
+        for (List w : winCondition) {
+            if (playerPos.containsAll(w)) {
+                return "Congratulations! You are a winner in my book!";
+            }
+
+            else if (cpuPos.containsAll(w)) {
+                return "WOW, The CPU actually won! You're a LOSER!";
+            }
+        }
+
+        if (playerPos.size() + cpuPos.size() == 9) {
+            return "ITS A TIE!";
+        }
+
+        return "";
+
+    }
+
+    // Inside this Instance method will be asking the users name at the begining of
+    // the game for introduction
+    public static void userName() {
+        System.out.println("Hello, welcome to my TicTacToe game! Please enter your name:");
+        Scanner scnr = new Scanner(System.in);
+        String name = scnr.nextLine();
+
+        System.out.println("Thats a great name " + name + " enjoy the quick game!");
+        System.out.println("");
+    }
+
+    // This is where The instance method that prints the board and runs all the code
+    // is put
+    public static void play() {
+        char[][] board = { { '1', '|', '2', '|', '3' }, { '-', '+', '-', '+', '-' }, { '4', '|', '5', '|', '6' },
+                { '-', '+', '-', '+', '-' }, { '7', '|', '8', '|', '9' } };
+
+        printTTTBoard(board);
+
+        System.out.println(
+                "Enter where you want to put your token on the corresponding numbers 1 - 9:\nThe CPU will automatically place its token after you.\nWe will now roll the dice to determine who moves first!");
+        // This will begin who decides to move first, cpu or player
+        Random rand = new Random();
+        int turn = 1 + rand.nextInt(2); // 1 = player, 2 = cpu
+
+        if (turn == 1) {
+            System.out.println("After rolling the dice, you have been blessed to go first!");
+        }
+
+        else if (turn == 2) {
+            System.out.println("After rolling the dice, you have clearly been cursed and move second!");
+        }
+
+        int play = 1;
+        // This while loop runs the code player first if the player is set to move first
+        while (true) {
+
+            if (turn == 1) {
+                Scanner scnr = new Scanner(System.in);
+                int playerToken = scnr.nextInt();
+                // set parameter for where you can place token
+                while (playerToken <= 0 || playerToken >= 10) {
+                    System.out.println("Invalid token position. Enter a valid position please.");
+                    playerToken = scnr.nextInt();
+                }
+                // this is to check if the player is placing a piece on the computers, and not
+                // allow it to override it.
+                while (playerPos.contains(playerToken) || cpuPos.contains(playerToken)) {
+
+                    System.out.println("Position taken by token. Enter a open position please.");
+                    playerToken = scnr.nextInt();
+
+                }
+
+                placeToken(board, playerToken, "Player");
+                // Use this function to check for a winner each turn, use it after the computers
+                // turn also
+                String fullGame = winners();
+                if (fullGame.length() > 0) {
+                    System.out.println(fullGame);
+                    break;
+                }
+                // This sets the randomizer for placing the computer token
+                Random r = new Random();
+
+                int cpuToken = 1 + r.nextInt(9);
+
+                while (playerPos.contains(cpuToken) || cpuPos.contains(cpuToken)) {
+
+                    cpuToken = 1 + r.nextInt(9);
+
+                }
+
+                placeToken(board, cpuToken, "CPU");
+
+                printTTTBoard(board);
+
+                fullGame = winners();
+                if (fullGame.length() > 0) {
+                    System.out.println(fullGame);
+                    break;
+                }
+
+            }
+            // This code is ran when the computer is set to go first, just the opposite of
+            // how player ran
+            else {
+
+                Scanner scnr = new Scanner(System.in);
+
+                Random r = new Random();
+
+                int cpuToken = 1 + r.nextInt(9);
+
+                while (playerPos.contains(cpuToken) || cpuPos.contains(cpuToken)) {
+
+                    cpuToken = 1 + r.nextInt(9);
+
+                }
+
+                placeToken(board, cpuToken, "CPU");
+
+                String fullGame = winners();
+                if (fullGame.length() > 0) {
+                    System.out.println(fullGame);
+                    break;
+                }
+                printTTTBoard(board);
+
+                int playerToken = scnr.nextInt();
+
+                while (playerToken <= 0 || playerToken >= 10) {
+                    System.out.println("Invalid token position. Enter a valid position please.");
+                    playerToken = scnr.nextInt();
+                }
+
+                while (playerPos.contains(playerToken) || cpuPos.contains(playerToken)) {
+                    System.out.println("Position taken by token. Enter a open position please.");
+                    playerToken = scnr.nextInt();
+                }
+
+                placeToken(board, playerToken, "Player");
+
+                fullGame = winners();
+                if (fullGame.length() > 0) {
+                    System.out.println(fullGame);
+                    break;
+                }
+
+            }
+
+        }
+
+        printTTTBoard(board);
+    }
+
+}
